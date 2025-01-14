@@ -4,7 +4,7 @@
 """
 import os
 import torchvision.transforms as tf
-from torchvision.datasets import DatasetFolder, ImageFolder
+from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +15,8 @@ def preprocess(path, batchsize, imagesize, shuffle = True):
                             tf.RandomHorizontalFlip(),
                             tf.ToTensor(),
                             tf.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
-    loaddata= ImageFolder(root=path, transform=transform)
+    train = 'train' in path
+    loaddata= CIFAR10(path, train=train, download=True, transform=transform)
     dataLoader = DataLoader(dataset=loaddata, batch_size= batchsize, shuffle=shuffle)
     classes_ = loaddata.classes
     images, class_ = iter(dataLoader).__next__()
