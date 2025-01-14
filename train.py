@@ -60,6 +60,7 @@ def train(opt):
     else:
         os.mknod(path_v)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("Running on " + (torch.cuda.get_device_name() if torch.cuda.is_available() else "CPU"))
     if opt.conv1_1 and opt.depth==16:
         model = Vgg(num_channels=num_channels,num_classes=classes,depth=opt.depth, initialize_weights=True,
                 conv1_1=opt.conv1_1).to(device)
