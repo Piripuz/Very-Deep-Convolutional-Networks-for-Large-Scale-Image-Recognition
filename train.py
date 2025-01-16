@@ -11,11 +11,13 @@ import sklearn.metrics as metrics
 import numpy as np
 from src.vdcnnIR import Vgg
 from src.preprocess import preprocess
+from src.mail import Email
 import matplotlib.pyplot as plt
 import torch.optim as optim
 import scikitplot
 import shutil
 import pickle
+import time
 
 def get_args():
     parser = argparse.ArgumentParser("""Very Deep Convolutional Networks for Large Scale Image Recognition""")
@@ -98,8 +100,10 @@ def train(opt):
     early_stop = False
     count = 0
     best_score = None
-
+    epochs_done = 0
+    
     for epoch in range(opt.epochs):
+        epochs_done += 1
         model.train()
         train_loss = []
         total_predictions = []
@@ -188,11 +192,22 @@ def train(opt):
     else:
         with open('results/losses_{}'.format(opt.depth), 'wb') as f:
             pickle.dump(losses, f)
-    return best_score
+    return (best_score, epochs_done)
 
 if __name__ == '__main__':
+    mail = Email()
     opt = get_args()
-    loss = train(opt)
+    start_time = time.time()
+    loss, epochs = train(opt)
+    message = ""
+    if epochs < opt.epochs:
+        message += "Early stopped.\n"
+    message += f"Finished training. Trained {epochs} epochs "
+    message += "in " + time.strftime('%H:%M:%S', time.gmtime(time.time() - start))
+    try:
+        mail.self_send("Finished training", message)
+    except:
+        print("Didn't manage to send email")
     print(loss)
 # if __name__ == '__main__':
 #     opt=get_args()
