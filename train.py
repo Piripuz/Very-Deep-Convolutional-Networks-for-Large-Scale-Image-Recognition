@@ -205,7 +205,6 @@ if __name__ == '__main__':
     message += f"Finished training. Trained {epochs} epochs "
     message += "in " + time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
     try:
-        breakpoint()
         mail.self_send("Finished training", message)
     except:
         print("Didn't manage to send email")
