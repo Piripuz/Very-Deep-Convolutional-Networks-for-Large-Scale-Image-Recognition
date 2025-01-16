@@ -34,7 +34,7 @@ def get_args():
                                                                         if does not improve validation loss""")
     parser.add_argument('-i', '--imagesize', type=int, default=64, help="it is used to resize the image pixels" )
     parser.add_argument('-lr', '--lr', type=int, default=0.001, help="learning rate for an Adam optimizer")
-    parser.add_argument('-lf', '--losses_file', type=string, default="losses", help="Base of the name of the file in which the (pickled) losses will be saved")
+    parser.add_argument('-lf', '--losses_file', type=str, default="losses", help="Base of the name of the file in which the (pickled) losses will be saved")
     args = parser.parse_args()
     return args
 
