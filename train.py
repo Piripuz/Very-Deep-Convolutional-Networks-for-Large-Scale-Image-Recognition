@@ -34,6 +34,7 @@ def get_args():
                                                                         if does not improve validation loss""")
     parser.add_argument('-i', '--imagesize', type=int, default=64, help="it is used to resize the image pixels" )
     parser.add_argument('-lr', '--lr', type=int, default=0.001, help="learning rate for an Adam optimizer")
+    parser.add_argument('-lf', '--losses_file', type=string, default="losses", help="Base of the name of the file in which the (pickled) losses will be saved")
     args = parser.parse_args()
     return args
 
@@ -187,10 +188,10 @@ def train(opt):
         model.train()
     losses = {'trainLoss':totalTrain_loss, 'valLoss':totalVal_loss}
     if opt.conv1_1 and opt.depth == 16:
-        with open('results/losses_C11_{}'.format(opt.depth), 'wb') as f:
+        with open('results' + os.sep + opt.losses_file + '_C11_{}'.format(opt.depth), 'wb') as f:
             pickle.dump(losses, f)
     else:
-        with open('results/losses_{}'.format(opt.depth), 'wb') as f:
+        with open('results' + os.sep + opt.losses_file + '_{}'.format(opt.depth), 'wb') as f:
             pickle.dump(losses, f)
     return (best_score, epochs_done)
 
