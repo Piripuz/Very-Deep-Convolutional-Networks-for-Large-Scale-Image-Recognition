@@ -196,7 +196,6 @@ def train(opt):
     return (best_score, epochs_done)
 
 if __name__ == '__main__':
-    mail = Email()
     opt = get_args()
     start_time = time.time()
     loss, epochs = train(opt)
@@ -206,6 +205,7 @@ if __name__ == '__main__':
     message += f"Finished training. Trained {epochs} epochs "
     message += "in " + time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
     try:
+        mail = Email()
         mail.self_send("Finished training", message)
     except:
         print("Didn't manage to send email")
