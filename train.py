@@ -47,11 +47,11 @@ def train(opt):
 
     num_channels = iter(trainGenerator).__next__()[0].size()[1]
     if opt.conv1_1 and opt.depth == 16:
-        path_t = 'results/VdcnnIR_train_C11_{}.txt'.format(opt.depth)
-        path_v = 'results/VdcnnIR_val_C11_{}.txt'.format(opt.depth)
+        path_t = 'results' + os.sep + 'VdcnnIR_train_C11_{}.txt'.format(opt.depth)
+        path_v = 'results' + os.sep + 'VdcnnIR_val_C11_{}.txt'.format(opt.depth)
     else:
-        path_t = 'results/VdcnnIR_train_{}.txt'.format(opt.depth)
-        path_v = 'results/VdcnnIR_val_{}.txt'.format(opt.depth)
+        path_t = 'results' + os.sep + 'VdcnnIR_train_{}.txt'.format(opt.depth)
+        path_v = 'results' + os.sep + 'VdcnnIR_val_{}.txt'.format(opt.depth)
     if os.path.exists(path_t):
         os.remove(path_t)
         os.mknod(path_t)
