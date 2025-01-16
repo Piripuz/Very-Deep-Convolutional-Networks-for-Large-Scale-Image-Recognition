@@ -20,7 +20,7 @@ class ConvBlock(nn.Module):
         else:
             self.conv = nn.Conv2d(in_channels=input_features,out_channels=output_features, kernel_size= kernel, padding=padding, stride= stride)
         self.bNorm= nn.BatchNorm2d(output_features)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.PReLU()
 
     def forward(self, x):
         # print(x.size())
@@ -102,8 +102,8 @@ class Vgg(nn.Module):
                     ConvBlock(input_features=8 * base_features, output_features=8 * base_features, kernel=3, padding=1,
                               stride=1))
         layers.append(nn.AdaptiveAvgPool2d(2))
-        fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features),nn.ReLU()])
-        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features),nn.ReLU()])
+        fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features),nn.PReLU()])
+        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features),nn.PReLU()])
         fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= self.num_classes)])
         self.layers = nn.Sequential(*layers)
         self.fc_layers = nn.Sequential(*fc_layers)
@@ -113,7 +113,7 @@ class Vgg(nn.Module):
     def _init_weights(self):
         for  m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out',nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, mode='fan_out')
                 if m.bias is None:
                     nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.BatchNorm2d):
