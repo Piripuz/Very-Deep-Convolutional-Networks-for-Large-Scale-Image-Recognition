@@ -87,9 +87,9 @@ def train(opt):
         plt.ylabel("Loss")
         plt.legend()
         if opt.conv1_1 and opt.depth==16:
-            plt.savefig("figures/trainVal_loss_C11_{}.png".format(opt.depth))
+            plt.savefig("figures' + os.sep + 'trainVal_loss_C11_{}.png".format(opt.depth))
         else:
-            plt.savefig("figures/trainVal_loss_{}.png".format(opt.depth))
+            plt.savefig("figures' + os.sep + 'trainVal_loss_{}.png".format(opt.depth))
 
         # plt.show()
         # plt.close()
@@ -167,9 +167,9 @@ def train(opt):
         if best_score is None:
             best_score = val_lossEpoch
             if opt.conv1_1 and opt.depth == 16:
-                torch.save(model, 'models/VdcnnIR_C11_{}'.format(opt.depth))
+                torch.save(model, 'models' + os.sep + 'VdcnnIR_C11_{}'.format(opt.depth))
             else:
-                torch.save(model, 'models/VdcnnIR_{}'.format(opt.depth))
+                torch.save(model, 'models' + os.sep + 'VdcnnIR_{}'.format(opt.depth))
         elif val_lossEpoch > best_score:
             print("Loss:{} doesn't decreased from {}".format(val_lossEpoch, best_score))
             count +=1
@@ -179,9 +179,9 @@ def train(opt):
             print("Loss:{} decreased from {}. Saving model........".format(val_lossEpoch, best_score))
             best_score = val_lossEpoch
             if opt.conv1_1 and opt.depth == 16:
-                torch.save(model, 'models/VdcnnIR_C11_{}'.format(opt.depth))
+                torch.save(model, 'models' + os.sep + 'VdcnnIR_C11_{}'.format(opt.depth))
             else:
-                torch.save(model, 'models/VdcnnIR_{}'.format(opt.depth))
+                torch.save(model, 'models' + os.sep + 'VdcnnIR_{}'.format(opt.depth))
             count = 0
         if early_stop:
             break
