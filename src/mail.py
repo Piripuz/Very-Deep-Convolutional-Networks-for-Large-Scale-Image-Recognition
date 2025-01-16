@@ -36,11 +36,12 @@ class Email:
             with open("token.pickle", "wb") as token:
                 pickle.dump(creds, token)
         self.service = build('gmail', 'v1', credentials=creds)
+        self.our_email = our_email
 
     def self_send(self, obj, body):
         message = MIMEText(body)
-        message['to'] = our_email
-        message['from'] = our_email
+        message['to'] = self.our_email
+        message['from'] = self.our_email
         message['subject'] = obj
         mail = {'raw': urlsafe_b64encode(message.as_bytes()).decode()}
         return self.service.users().messages().send(

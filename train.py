@@ -26,7 +26,7 @@ def get_args():
     parser.add_argument('-v', '--val', type=str, default='val_', help="""required image dataset for training a model.
                                                                               It must be in the data directory """)
     parser.add_argument('-b', '--batchsize', type=int, choices=[64,128,256, 512], default=64, help='select number of samples to load from dataset')
-    parser.add_argument('-e', '--epochs', type=int, choices=[50, 100, 150], default=50)
+    parser.add_argument('-e', '--epochs', type=int, choices=[0, 1, 2, 10, 50, 100, 150], default=50)
     parser.add_argument('-d', '--depth', type=int, choices=[11,13,16,19], default=11, help='depth of the deep learning model')
     parser.add_argument('-c11', '--conv1_1', action='store_true', default=False,
                         help="""setting it True will replace some of the 3x3 Conv layers with 1x1 Conv layers in the 16 layer network""")
@@ -203,8 +203,9 @@ if __name__ == '__main__':
     if epochs < opt.epochs:
         message += "Early stopped.\n"
     message += f"Finished training. Trained {epochs} epochs "
-    message += "in " + time.strftime('%H:%M:%S', time.gmtime(time.time() - start))
+    message += "in " + time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
     try:
+        breakpoint()
         mail.self_send("Finished training", message)
     except:
         print("Didn't manage to send email")
