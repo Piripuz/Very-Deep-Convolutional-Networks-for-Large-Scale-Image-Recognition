@@ -18,7 +18,7 @@ from mimetypes import guess_type as guess_mime_type
 SCOPES = ['https://mail.google.com/']
 
 class Email:
-    def __init__(self, our_email = 'eric.bjorndal33@gmail.com'):
+    def __init__(self, our_email = 'pietro99giardina@gmail.com'):
         creds = None
         # the file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first time
