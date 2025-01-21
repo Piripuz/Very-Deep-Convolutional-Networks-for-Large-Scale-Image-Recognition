@@ -126,9 +126,9 @@ def train(opt):
         plt.ylabel("Loss")
         plt.legend()
         if opt.conv1_1 and opt.depth==16:
-            plt.savefig("figures' + os.sep + 'trainVal_loss_C11_{}.png".format(opt.depth))
+            plt.savefig('figures' + os.sep + 'trainVal_loss_C11_{}.png'.format(opt.depth))
         else:
-            plt.savefig("figures' + os.sep + 'trainVal_loss_{}.png".format(opt.depth))
+            plt.savefig('figures' + os.sep + 'trainVal_loss_{}.png'.format(opt.depth))
 
         # plt.show()
         # plt.close()
@@ -137,6 +137,7 @@ def train(opt):
 
     totalVal_loss = []
     totalTrain_loss = []
+    p_params = []
     early_stop = False
     count = 0
     best_score = None
@@ -167,12 +168,14 @@ def train(opt):
             print('Iter: [{}/{}]\t Epoch: [{}/{}]\t Loss: {}\t Acc: {}'.format(idx+1, len(trainGenerator), epoch+1, opt.epochs,
                                                                     loss.item(),
                                                                     metrics.accuracy_score(label.cpu(), prob_)))
-            prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
-            print(prelu_params)
-        
+        prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
+        prelu_params = list(map(lambda x: x.item(), prelu_params))
+        p_params.append(prelu_params)
+     
         scheduler.step()
         loss_epoch = sum(train_loss)/len(traindata)
         totalTrain_loss.append(loss_epoch)
+        
         with open(path_t, 'a') as f:
             f.write('Epoch: {}\t Loss: {}\t Accuracy: {}\n'.format(epoch+1, loss_epoch,
                                                          metrics.accuracy_score(total_labels,total_predictions)))
@@ -236,6 +239,8 @@ def train(opt):
     else:
         with open('results' + os.sep + opt.losses_file + '_{}'.format(opt.depth), 'wb') as f:
             pickle.dump(losses, f)
+    with open('results' + os.sep + opt.lossees_file + '_{}_p-weights'.format(opt.depth), 'wb') as f:
+        pickle.dump(p_params, f)
     return (best_score, epochs_done)
 
 if __name__ == '__main__':
