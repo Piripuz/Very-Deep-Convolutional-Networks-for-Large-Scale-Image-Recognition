@@ -108,9 +108,9 @@ def train(opt):
         plt.ylabel("Loss")
         plt.legend()
         if opt.conv1_1 and opt.depth==16:
-            plt.savefig("figures' + os.sep + 'trainVal_loss_C11_{}.png".format(opt.depth))
+            plt.savefig('figures' + os.sep + 'trainVal_loss_C11_{}.png'.format(opt.depth))
         else:
-            plt.savefig("figures' + os.sep + 'trainVal_loss_{}.png".format(opt.depth))
+            plt.savefig('figures' + os.sep + 'trainVal_loss_{}.png'.format(opt.depth))
 
         # plt.show()
         # plt.close()
