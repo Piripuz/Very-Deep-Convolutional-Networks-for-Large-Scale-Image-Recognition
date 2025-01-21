@@ -92,6 +92,35 @@ def train(opt):
                 group['weight_decay'] = decay
             self.current_step += 1
 
+    class PReLUParameterScheduler:
+        def __init__(self, prelu_params, initial_value, max_value, steps):
+            """
+            Initialize the PReLUParameterScheduler.
+
+            Args:
+                prelu_params (list): List of PReLU parameters (tensor references).
+                initial_value (float): Starting value for the PReLU parameters.
+                max_value (float): Maximum value for the PReLU parameters.
+                steps (int): Total number of steps for the adjustment.
+            """
+            self.prelu_params = prelu_params
+            self.initial_value = initial_value
+            self.max_value = max_value
+            self.steps = steps
+            self.current_step = 0
+
+        def step(self):
+            """
+            Perform a step to adjust the PReLU parameters.
+            """
+            adjustment = max(
+                self.initial_value + (self.max_value - self.initial_value) * (self.current_step / self.steps),
+                self.max_value,
+            )
+            for param in self.prelu_params:
+                param.data.fill_(adjustment)  # Directly set the value of the PReLU parameter
+            self.current_step += 1    
+
     prelu_params = []
     other_params = []
     for name, param in model.named_parameters():
@@ -107,12 +136,14 @@ def train(opt):
 
     # Optimizer for PReLU parameters
     prelu_optimizer = optim.Adam([
-        {'params': prelu_params, 'weight_decay': 0}
+        {'params': prelu_params, 'weight_decay': 0.5}
     ], lr=opt.lr*10)
 
-    optimizer = optim.Adam(model.parameters(), lr=opt.lr)
+    #optimizer = optim.Adam(model.parameters(), lr=opt.lr)
     criterion = nn.CrossEntropyLoss()
-    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=0.0, max_decay=0.1, steps=100)
+    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=-10, max_decay=1, steps=opt.epochs)
+    scheduler2 = PReLUParameterScheduler(prelu_params, initial_value=1, max_value=0, steps=3)
+
 
     def plot_fig(train_loss, val_loss):
         plt.figure(figsize=(10,8))
@@ -155,6 +186,7 @@ def train(opt):
             label = label.to(device)
             # print(data_.size())
             optimizer.zero_grad()
+            #prelu_optimizer.zero_grad()
             prob = model(data_)
             # print(prob)
             prob_ = np.argmax(prob.detach().cpu(), -1)
@@ -162,17 +194,22 @@ def train(opt):
             train_loss.append(loss.item()*len(label.cpu()))
             loss.backward()
             optimizer.step()
-            prelu_optimizer.step()
+            #prelu_optimizer.step()
+            #scheduler2.step()
             total_predictions.extend(prob_)
             total_labels.extend(label.cpu())
             print('Iter: [{}/{}]\t Epoch: [{}/{}]\t Loss: {}\t Acc: {}'.format(idx+1, len(trainGenerator), epoch+1, opt.epochs,
                                                                     loss.item(),
                                                                     metrics.accuracy_score(label.cpu(), prob_)))
+            prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
+            print(prelu_params)
+            print(prelu_optimizer.param_groups[0]["weight_decay"])
         prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
         prelu_params = list(map(lambda x: x.item(), prelu_params))
         p_params.append(prelu_params)
      
-        scheduler.step()
+        #scheduler.step()
+        scheduler2.step()
         loss_epoch = sum(train_loss)/len(traindata)
         totalTrain_loss.append(loss_epoch)
         
