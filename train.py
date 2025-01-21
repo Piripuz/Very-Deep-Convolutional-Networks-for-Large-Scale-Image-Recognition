@@ -54,14 +54,19 @@ def train(opt):
         path_v = 'results' + os.sep + 'VdcnnIR_val_{}.txt'.format(opt.depth)
     if os.path.exists(path_t):
         os.remove(path_t)
-        os.mknod(path_t)
+        #os.mknod(path_t)
+        open(path_t, 'w').close()
     else:
-        os.mknod(path_t)
+        #os.mknod(path_t)
+        open(path_t, 'w').close()
+
     if os.path.exists(path_v):
         os.remove(path_v)
-        os.mknod(path_v)
+        #os.mknod(path_v)
+        open(path_v, 'w').close()
     else:
-        os.mknod(path_v)
+        #os.mknod(path_v)
+        open(path_v, 'w').close()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Running on " + (torch.cuda.get_device_name() if torch.cuda.is_available() else "CPU"))
     if opt.conv1_1 and opt.depth==16:
@@ -72,8 +77,24 @@ def train(opt):
         model = Vgg(num_channels=num_channels, num_classes=classes, depth=opt.depth, initialize_weights=True,
                     conv1_1=False).to(device)
     # return model
+
+    class WeightDecayScheduler:
+        def __init__(self, optimizer, initial_decay, max_decay, steps):
+            self.optimizer = optimizer
+            self.initial_decay = initial_decay
+            self.max_decay = max_decay
+            self.steps = steps
+            self.current_step = 0
+
+        def step(self):
+            decay = min(self.initial_decay + (self.max_decay - self.initial_decay) * (self.current_step / self.steps), self.max_decay)
+            for group in self.optimizer.param_groups:
+                group['weight_decay'] = decay
+            self.current_step += 1
+    
     optimizer = optim.Adam(model.parameters(), lr=opt.lr)
     criterion = nn.CrossEntropyLoss()
+    scheduler = WeightDecayScheduler(optimizer, initial_decay=0.0, max_decay=0.1, steps=100)
 
     def plot_fig(train_loss, val_loss):
         plt.figure(figsize=(10,8))
@@ -127,6 +148,7 @@ def train(opt):
             print('Iter: [{}/{}]\t Epoch: [{}/{}]\t Loss: {}\t Acc: {}'.format(idx+1, len(trainGenerator), epoch+1, opt.epochs,
                                                                     loss.item(),
                                                                     metrics.accuracy_score(label.cpu(), prob_)))
+        scheduler.step()
 
         loss_epoch = sum(train_loss)/len(traindata)
         totalTrain_loss.append(loss_epoch)
@@ -196,7 +218,7 @@ def train(opt):
     return (best_score, epochs_done)
 
 if __name__ == '__main__':
-    mail = Email()
+    #mail = Email()
     opt = get_args()
     start_time = time.time()
     loss, epochs = train(opt)
@@ -205,10 +227,10 @@ if __name__ == '__main__':
         message += "Early stopped.\n"
     message += f"Finished training. Trained {epochs} epochs "
     message += "in " + time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
-    try:
-        mail.self_send("Finished training", message)
-    except:
-        print("Didn't manage to send email")
+    #try:
+    #    mail.self_send("Finished training", message)
+    #except:
+    #    print("Didn't manage to send email")
     print(loss)
 # if __name__ == '__main__':
 #     opt=get_args()
