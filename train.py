@@ -91,10 +91,28 @@ def train(opt):
             for group in self.optimizer.param_groups:
                 group['weight_decay'] = decay
             self.current_step += 1
-    
+
+    prelu_params = []
+    other_params = []
+    for name, param in model.named_parameters():
+        if 'relu' in name:  # Identify PReLU parameters
+            prelu_params.append(param)
+        else:
+            other_params.append(param)
+
+    # Optimizer for other parameters
+    optimizer = optim.Adam([
+        {'params': other_params, 'weight_decay': 0}
+    ], lr=opt.lr)
+
+    # Optimizer for PReLU parameters
+    prelu_optimizer = optim.Adam([
+        {'params': prelu_params, 'weight_decay': 0}
+    ], lr=opt.lr*10)
+
     optimizer = optim.Adam(model.parameters(), lr=opt.lr)
     criterion = nn.CrossEntropyLoss()
-    scheduler = WeightDecayScheduler(optimizer, initial_decay=0.0, max_decay=0.1, steps=100)
+    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=0.0, max_decay=0.1, steps=100)
 
     def plot_fig(train_loss, val_loss):
         plt.figure(figsize=(10,8))
@@ -143,12 +161,16 @@ def train(opt):
             train_loss.append(loss.item()*len(label.cpu()))
             loss.backward()
             optimizer.step()
+            prelu_optimizer.step()
             total_predictions.extend(prob_)
             total_labels.extend(label.cpu())
             print('Iter: [{}/{}]\t Epoch: [{}/{}]\t Loss: {}\t Acc: {}'.format(idx+1, len(trainGenerator), epoch+1, opt.epochs,
                                                                     loss.item(),
                                                                     metrics.accuracy_score(label.cpu(), prob_)))
-
+            prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
+            print(prelu_params)
+        
+        scheduler.step()
         loss_epoch = sum(train_loss)/len(traindata)
         totalTrain_loss.append(loss_epoch)
         with open(path_t, 'a') as f:
