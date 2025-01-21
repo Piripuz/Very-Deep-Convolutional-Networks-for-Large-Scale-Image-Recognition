@@ -218,7 +218,7 @@ def train(opt):
     else:
         with open('results' + os.sep + opt.losses_file + '_{}'.format(opt.depth), 'wb') as f:
             pickle.dump(losses, f)
-    with open('results' + os.sep + opt.lossees_file + '_{}_p-weights'.format(opt.depth), 'wb') as f:
+    with open('results' + os.sep + opt.losses_file + '_{}_p-weights'.format(opt.depth), 'wb') as f:
         pickle.dump(p_params, f)
     return (best_score, epochs_done)
 
