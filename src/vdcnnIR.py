@@ -20,7 +20,7 @@ class ConvBlock(nn.Module):
         else:
             self.conv = nn.Conv2d(in_channels=input_features,out_channels=output_features, kernel_size= kernel, padding=padding, stride= stride)
         self.bNorm= nn.BatchNorm2d(output_features)
-        self.relu = nn.PReLU()
+        self.relu = nn.PReLU(init=1.0)
 
     def forward(self, x):
         # print(x.size())
@@ -36,6 +36,8 @@ class Vgg(nn.Module):
         self.num_channels = num_channels
         self.num_classes = num_classes
         self.depth = depth
+        self.relu1 = nn.PReLU(init=1.0)
+        self.relu2 = nn.PReLU(init=1.0)
         layers = []
         fc_layers = []
         base_features = 64
@@ -102,8 +104,8 @@ class Vgg(nn.Module):
                     ConvBlock(input_features=8 * base_features, output_features=8 * base_features, kernel=3, padding=1,
                               stride=1))
         layers.append(nn.AdaptiveAvgPool2d(2))
-        fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features),nn.PReLU()])
-        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features),nn.PReLU()])
+        fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features), self.relu1])
+        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features), self.relu2])
         fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= self.num_classes)])
         self.layers = nn.Sequential(*layers)
         self.fc_layers = nn.Sequential(*fc_layers)

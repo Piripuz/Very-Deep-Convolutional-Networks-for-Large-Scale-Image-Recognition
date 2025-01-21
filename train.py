@@ -148,7 +148,6 @@ def train(opt):
             print('Iter: [{}/{}]\t Epoch: [{}/{}]\t Loss: {}\t Acc: {}'.format(idx+1, len(trainGenerator), epoch+1, opt.epochs,
                                                                     loss.item(),
                                                                     metrics.accuracy_score(label.cpu(), prob_)))
-        scheduler.step()
 
         loss_epoch = sum(train_loss)/len(traindata)
         totalTrain_loss.append(loss_epoch)
