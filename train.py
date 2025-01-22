@@ -123,7 +123,6 @@ def train(opt):
 
     prelu_params = []
     other_params = []
-    prelu_params = []
     for name, param in model.named_parameters():
         if 'relu' in name:  # Identify PReLU parameters
             prelu_params.append(param)
@@ -137,13 +136,13 @@ def train(opt):
 
     # Optimizer for PReLU parameters
     prelu_optimizer = optim.Adam([
-        {'params': prelu_params, 'weight_decay': 0.5}
-    ], lr=opt.lr*10)
-
+        {'params': prelu_params, 'weight_decay': 0}
+    ], lr=opt.lr)
+    prelu_params = []
     #optimizer = optim.Adam(model.parameters(), lr=opt.lr)
     criterion = nn.CrossEntropyLoss()
-    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=-10, max_decay=1, steps=opt.epochs)
-    scheduler2 = PReLUParameterScheduler(prelu_params, initial_value=1, max_value=0, steps=3)
+    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=0, max_decay=0.1, steps=opt.epochs)
+    scheduler2 = PReLUParameterScheduler(prelu_params, initial_value=1, max_value=0, steps=5)
 
 
     def plot_fig(train_loss, val_loss):
@@ -176,6 +175,7 @@ def train(opt):
     epochs_done = 0
     
     for epoch in range(opt.epochs):
+        # scheduler2.step()
         epochs_done += 1
         model.train()
         train_loss = []
@@ -187,7 +187,7 @@ def train(opt):
             label = label.to(device)
             # print(data_.size())
             optimizer.zero_grad()
-            #prelu_optimizer.zero_grad()
+            prelu_optimizer.zero_grad()
             prob = model(data_)
             # print(prob)
             prob_ = np.argmax(prob.detach().cpu(), -1)
@@ -195,22 +195,20 @@ def train(opt):
             train_loss.append(loss.item()*len(label.cpu()))
             loss.backward()
             optimizer.step()
-            #prelu_optimizer.step()
-            #scheduler2.step()
+            prelu_optimizer.step()
             total_predictions.extend(prob_)
             total_labels.extend(label.cpu())
             print('Iter: [{}/{}]\t Epoch: [{}/{}]\t Loss: {}\t Acc: {}'.format(idx+1, len(trainGenerator), epoch+1, opt.epochs,
                                                                     loss.item(),
                                                                     metrics.accuracy_score(label.cpu(), prob_)))
             prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
-            print(prelu_params)
-            print(prelu_optimizer.param_groups[0]["weight_decay"])
+        print(prelu_params)
+        print(prelu_optimizer.param_groups[0]["weight_decay"])
         prelu_params = [param for name, param in model.named_parameters() if 'relu' in name]
         prelu_params = list(map(lambda x: x.item(), prelu_params))
         p_params.append(prelu_params)
      
-        #scheduler.step()
-        scheduler2.step()
+        scheduler.step()
         loss_epoch = sum(train_loss)/len(traindata)
         totalTrain_loss.append(loss_epoch)
         
@@ -277,7 +275,7 @@ def train(opt):
     else:
         with open('results' + os.sep + opt.losses_file + '_{}'.format(opt.depth), 'wb') as f:
             pickle.dump(losses, f)
-    with open('results' + os.sep + opt.lossees_file + '_{}_p-weights'.format(opt.depth), 'wb') as f:
+    with open('results' + os.sep + opt.losses_file + '_{}_p-weights'.format(opt.depth), 'wb') as f:
         pickle.dump(p_params, f)
     return (best_score, epochs_done)
 
