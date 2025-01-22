@@ -141,7 +141,7 @@ def train(opt):
     prelu_params = []
     #optimizer = optim.Adam(model.parameters(), lr=opt.lr)
     criterion = nn.CrossEntropyLoss()
-    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=0, max_decay=0.1, steps=opt.epochs)
+    scheduler = WeightDecayScheduler(prelu_optimizer, initial_decay=0, max_decay=2, steps=opt.epochs)
     scheduler2 = PReLUParameterScheduler(prelu_params, initial_value=1, max_value=0, steps=5)
 
 
