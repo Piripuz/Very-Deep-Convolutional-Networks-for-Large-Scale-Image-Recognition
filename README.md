@@ -3,91 +3,10 @@
 
 # Very-Deep-Convolutional-Networks-for-Large-Scale-Image-Recognition
 
-This project work is a implementation of [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) in Pytorch. 
-However, the dataset used for this project is from [Tiny ImageNet Visual Recognition Challenge](https://tiny-imagenet.herokuapp.com/). The model performance can be 
-improved by using smaller convolutional filter (i.e feature extraction maps) with 3x3 size while increasing network layer depth. In this model, an adaptive maxpooling 
-layer was used between the final ConvNet layer and fully connected layer. Furthermore, this model  doesn't use any out dropout layers.
- 
+This repository is a fork of [this work](https://github.com/Prabhu204/Very-Deep-Convolutional-Networks-for-Large-Scale-Image-Recognition/tree/master), a
+implementation of [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) in Pytorch by [Prabhu Appalapuri](https://github.com/Prabhu204).
 
-### Model Architecture
-The models were implemented as per original paper description, which can be seen in the following figure. 
-
-
-<img src="figures/ConNet_config.png" width="600" height="600">
-<!--![Model Architecture](figures/ConNet_config.png)-->
-
-### Dataset
-
-The dataset is devided in to 3 sets:
-
-- Trainset is composed with 200 clasess and each class has 200 samples with a 64x64 pixels
-- Validationset has composed with a 50 samples per each class. 
-- Testset is a total size 10000 samples.
-
-<b>Sample images from trainset:</b>
-
-![trainsample](figures/train_sample.png)
-
-<b>Sample images from validationset:</b>
-
-![valsample](figures/val_sample.png)
-
-
-### Computing resources 
-The models were trained on GPU, which is having a configuration of Nvidia-GTX 1070 8gb. Each model has took approx. 14h to 20h for training.  
-
-### Results
-
-
-
-<b>Model performance plots:</b>
-
-<!--![11 layer model](figures/trainVal_loss_11.png =250x)   ![13 layer model](figures/trainVal_loss_13.png =250x)-->
-
-<!--![16 layer model](figures/trainVal_loss_16.png =250x)   ![16_c11 layer model](figures/trainVal_loss_C11_16.png =250x)-->
-
-<!--![19 layer model](figures/trainVal_loss_19.png =250x)-->
-
-<p >
-  <img src="figures/trainVal_loss_11.png" width="400" height="400" alt="11 layer model">
-  <img src="figures/trainVal_loss_13.png" width="400" height="400" alt="13 layer model">
-  <img src="figures/trainVal_loss_16.png" width="400" height="400" alt="16 layer model">
-  <img src="figures/trainVal_loss_C11_16.png" width="400" height="400" alt="16 C1x1 layer model">
-  <img src="figures/trainVal_loss_19.png" width="400" height="400" alt="19 layer model">
-</p>
-
-
-
-<b>Accuracy:</b>
-
-|layers Vs Dataset    | Trainset | Valset | Testset |
-|-------------------|----------|--------|---------|
-| 11 layers         | 0.4800       |  0.3591      |    -     |
-| 13 layers         | 0.5133       |  0.4001    |       -  |
-| 16 layers         |  0.48322      |   0.3692     |      -   |
-| 16 layers, Cf:1x1 |  0.4932        |    0.3845    |     -    |
-| 19 layers         |    0.4890      | 0.3563       |      -   |
-
-<b>Loss:</b>
-
-|layers Vs Dataset    | Trainset | Valset | Testset |
-|-------------------|----------|--------|---------|
-| 11 layers         |  2.03        |  2.75  |    -     |
-| 13 layers         |  1.85        | 2.57       | -        |
-| 16 layers         |  1.95        |    2.65    |  -       |
-| 16 layers, Cf:1x1 |   1.91       |     2.63   |   -      |
-| 19 layers         |      1.92    |   2.79     |    -     |
-
-
-<b>Sample testset images with its predicted class:</b>
-
-![testsample](figures/test_predictions.png)
-
-
-Prediction results were available at [test predictions file.](results/test_predictions.csv) Columns names <b>11,13,16,16_C11 and 19</b> were the predictions made by the each model.
-However, the predictions were different for different models. Hence, prediction for each test image was decided based on the highest frequency of a predicted class by each model. 
-Furthermore, the models made an unique prediction for some of the test images. In this case, prediction was considered from 11 layer model.      
-
+We made the models run on the CIFAR100 dataset, and modified them to support our different scheduling strategies.
 
 
 ### Usage
@@ -119,6 +38,9 @@ Very Deep Convolutional Networks for Large Scale Image Recognition
       -i IMAGESIZE, --imagesize IMAGESIZE
                             it is used to resize the image pixels
       -lr LR, --lr LR       learning rate for an Adam optimizer
+      -lf LOSSES_FILE, --losses_file LOSSES_FILE
+      	                    Base of the name of the file in which the (pickled)
+			    losses will be saved
 
 
 <b>Example usage:</b>
